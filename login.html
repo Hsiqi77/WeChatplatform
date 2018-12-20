@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>登录</title>
+    <style>
+        body{
+            width: 100%;
+            height: 100%;
+            background: url("img/bg.jpg")no-repeat -350px 0;
+            background-size: 300%;
+        }
+    </style>
+</head>
+<body>
+<form action="login.php" method="post">
+    <div class="mycenter">
+        <div class="mysign">
+            <div class="col-lg-11 text-center text-info">
+                <h2 style="margin-top: 70px;margin-bottom: 70px">登录</h2>
+            </div>
+            <div class="col-lg-10" style="margin-bottom: 2%">
+                <select class="form-control" id="userType">
+                    <option value="">请选择类型</option>
+                    <option value="ROLE_USE_UNIT">使用单位</option>
+                    <option value="ROLE_INSTALL_MAINT_UNIT">维保单位</option>
+                    <option value="ROLE_MONITOR_UNIT">监察单位</option>
+                </select>
+            </div>
+            <div class="col-lg-10" style="margin-bottom: 2%">
+                <input type="text" class="form-control" name="username" placeholder="请输入用户名或账号" required autofocus id="userName"/>
+            </div>
+            <div class="col-lg-10" style="margin-bottom: 6%">
+                <input type="password" class="form-control" name="password" placeholder="请输入密码" required autofocus id="passWord"/>
+            </div>
+            <div class="col-lg-10" style="margin-bottom: 6%">
+                <input type="password" class="form-control" name="captcha" placeholder="请输入验证码" required autofocus id="captcha" style="width: 68%;display: inline-block"/>
+                <img src="https://www.gzisd.org:8443/web/public/captcha" alt="" style="width: 30%;display: inline-block" id="src">
+            </div>
+            <div class="col-lg-10" style="margin-bottom: 6%" id="remenberPassword">
+                <label>
+                    <input type="checkbox"> 记住密码
+                </label>
+            </div>
+            <div class="col-lg-10">
+                <button type="button" class="btn btn-success" style="width: 100%" id="loginBtn">登录</button>
+            </div>
+            <div class="col-lg-10" style="margin-top: 2%">
+                <div id="formtip"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="node_modules/jquery/dist/jquery.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+<script>
+    $("#loginBtn").click(function(){
+        var user = new Object();
+        user.userName = $.trim($("#userName").val());  //用户名
+        user.passWord = $.trim($("#passWord").val()); //密码
+		user.role = $.trim($("#userType").val());  //用户类型
+		user.captcha=$.trim($("#captcha").val())//验证码
+        //所有input框非空验证
+        if(user.userName == "" || user.userName == null){
+            $("#userName").focus;
+           $("#formtip").css("color","red");
+           $("#formtip").html("登录用户名或账号不能为空！");
+        }else if(user.passWord == "" || user.passWord == null){
+            $("#passWord").focus;
+           $("#formtip").css("color","red");
+           $("#formtip").html("登录密码不能为空！");
+        }else if(user.role==""){
+            $("#formtip").css("color","red");
+            $("#formtip").html("请选择用户类型！");
+        }else if(user.captcha==""){
+            $("#formtip").css("color","red");
+            $("#formtip").html("验证码不能为空！");
+        }else{
+           $("#formtip").html("");//如果账号和密码都不为空，就进行 ajax 异步提交
+            $.ajax({
+                type:'POST',
+                url:'https://www.gzisd.org:8443/web/public/login',
+                xhrFields: {
+                    withCredentials: true
+                },
+                data:{
+                    username:user.userName,
+                    password:user.passWord,
+                    role:user.role,
+                    captcha:user.captcha
+                },
+                dataType:'json',
+                timeout:1000,  //请求超时时间，毫秒
+                success:function(data){
+                    if(data.access_token){
+                        //对该域内的token对象用登录成功后的用户信息进行赋值
+                        sessionStorage.setItem('token', data.access_token)
+
+                        //如果返回的数据里包含额外的单位信息
+                        if (data.extraInfoes.unit) {
+                            //在sessionStorage仓库里，设置一个名为entrustUnit的key，value是单位的主键ID
+                            sessionStorage.setItem('entrustUnit', data.extraInfoes.unit.nid)
+                            //在sessionStorage仓库里，设置一个名为UnitName的key，value是单位的名称
+                            sessionStorage.setItem('UnitName', data.extraInfoes.unit.name)
+                            //在sessionStorage仓库里，设置一个名为UseUnitPower的key，value是是否省属企业
+                            sessionStorage.setItem(
+                                'UseUnitPower',
+                                data.extraInfoes.unit.isExempt
+                            )
+                        }
+
+                        //如果当前登录页面，勾选了记住密码
+                        if ($('#remenberPassword').attr('checked')) {
+                            //当前所选的单位类型、填写的账号密码写进cookie里
+                            setCookie('unit', user.role, data.expires_in)
+                            setCookie('user', user.userName, data.expires_in)
+                            setCookie('pswd', user.passWord, data.expires_in)
+                        } else {
+                            //如果当前登录页面，没有勾选了记住密码，移除cookie里的登录信息
+                            delCookie('unit')
+                            delCookie('user')
+                            delCookie('pswd')
+                        }
+
+                        //根据所选的单位类型，跳转到不同的首页
+                        if (user.role === 'ROLE_USE_UNIT') {
+                            window.location.href='index1.html';
+                        } else if (user.role === 'ROLE_INSTALL_MAINT_UNIT') {
+                            window.location.href='index2.html';
+                        } else if (user.role === 'ROLE_MONITOR_UNIT') {
+                            window.location.href='index3.html';
+                        }
+                    }else if (data.error === 'invalid_captcha') {
+                        $("#formtip").css("color","red");
+                        $("#formtip").html("验证码错误，请重新填写！");
+                        $("#captcha").val("")
+                        $('#src').attr("src", "https://www.gzisd.org:8443/web/public/captcha?" +new Date().getTime());
+                    }else if (data.error === 'get_access_token_error') {
+                        $("#formtip").css("color","red");
+                        $("#formtip").html("用户名或密码错误,请重新填写！");
+                        $("#userName").val("")
+                        $("#passWord").val("")
+                    } else if (data.error === 'user_not_has_role') {
+                        $("#formtip").css("color","red");
+                        $("#formtip").html("选择单位类型不匹配,请重新选择！");
+                    }else if (data.error === 'no_login' ){
+                        $("#formtip").css("color","red");
+                        $("#formtip").html("连续登录5次错误，5分钟内禁止登录！");
+                    }
+                },
+                error:function(){  //请求失败的回调方法
+                    $("#formtip").css("color","red");
+                    $("#formtip").html("登录失败！请重试。");
+                },
+            });
+        }
+    });
+//点击更换验证码
+    $('#src').click(function () {
+        this.src="https://www.gzisd.org:8443/web/public/captcha?"+new Date().getTime()
+    })
+</script>
+</body>
+</html>

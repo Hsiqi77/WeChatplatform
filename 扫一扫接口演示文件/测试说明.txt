@@ -1,0 +1,15 @@
+如何测试这3个文件？
+testsaoyisao.htm	上传后直接访问，手机访问测试：http://www.jiujiujin.net/testsaoyisao.htm
+wuliu.htm	上传后需要构造网址访问，手机访问测试：http://sao315.com/w/api/saoyisao?redirect_uri=http://www.jiujiujin.net/wuliu.htm
+testlogin.htm	上传后需要构造网址访问，手机访问测试：http://sao315.com/w/api/getopenid?redirect_uri=http://www.jiujiujin.net/testlogin.htm
+
+第一个适用于在自己的网页内任何一处嵌入扫一扫功能，接口会自动检测来路，并将扫描的结果附在参数中返回到来路网址，这样自己的网页获取结果可以进行处理。
+第二个是指定接口将结果返回到目标页面，适合直接设置在自己的微信号菜单里直接设置，扫描后到目标页面获取结果并处理，例如查快递物流信息。
+第三个是适合自己系统中的登录处理。在自己网页上添加“登录”按钮，或者直接作为自己的系统登录入口。访问后接口会将openid返回到目标网页，确定他的身份，如果该openid绑定了账号密码就直接进入系统。 openid是表示用户访问这个接口的身份标识。不论什么时候用户微信上访问此接口得到的openid始终是不变的。
+
+
+
+
+技术支持QQ：171977759
+
+06:28 2018-07-19

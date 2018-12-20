@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<script src="https://cdn.staticfile.org/jquery/1.11.2/jquery.min.js"></script>
+<title>获取openid</title>
+</head>
+<body>
+<div id="result"></div>
+</body>
+<script type="text/javascript">
+var openid=getQueryString("openid");
+if(openid){
+	$("#result").html("openid=" + openid + "<br><br>当前url=" + location.href + "<br><br>取得openid就可以确认当前来访者的身份了，如果绑定了账号就可以免登录直接进入后台。");
+}else{
+	$("#result").html("获取openid失败！请在微信端访问此页面.");
+}
+
+function getQueryString(name)
+{
+	var reg = new RegExp("\\b"+ name +"=([^&]*)");
+	var r = location.href.match(reg);
+	if (r!=null) return unescape(r[1]);
+}
+</script>
