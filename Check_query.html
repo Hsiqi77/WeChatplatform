@@ -6,13 +6,32 @@
           content="width=device-width,initial-scale=1.0,user-scalable=no">
     <title>检验查询</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="js/bootstrap-table-develop/dist/bootstrap-table.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/1.css">
     <style>
         *{
             margin: 0;
             padding: 0;
         }
-        .table th,td{
+        #tb_departments th,td{
             text-align: center;
+            white-space: nowrap;
+        }
+        #tb_departments td{
+            padding:2%;
+        }
+        /*日历的*/
+        .timepicker{
+            display: none;
+        }
+
+        .container-fluid {
+             padding-right: 2%;
+             padding-left: 2%;
+            margin-right: auto;
+            margin-left: auto;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -85,74 +104,212 @@
             <div class="form-group">
                 <label  class="col-xs-4 control-label" style="text-align: center;line-height: 30px">检验日期</label>
                 <div class="col-xs-8">
-                    <input type="email" class="form-control"  placeholder="选择时间">
+                    <div class="iDate full" id="dateBtn">
+                        <input type="text"  placeholder="选择时间">
+                        <button type="button" class="addOn"></button>
+                    </div>
+                    <!--<input type="email" class="form-control">-->
                 </div>
             </div>
             <div class="row" style="text-align: right;padding-right: 4%">
-                <button type="button" class="btn btn-info">查询</button>
+                <button type="button" class="btn btn-info" style="background: #5bc0de;color: white;border: none">查询</button>
                 <button type="button" class="btn btn-default">重置</button>
             </div>
         </div>
     </form>
-        <div class="row" style="margin-top: 2%;padding: 1%;box-sizing: border-box">
-            <table class="table table-bordered" style="overflow: scroll">
-                <tbody>
-                <tr>
-                    <td style="background: #f8f8f9;;">序号</td>
-                    <td>1</td>
-                    <td style="background: #f8f8f9;">检验进度</td>
-                    <td>未出报告</td>
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9;">业务类别</td>
-                    <td>法定</td>
-                    <td style="background: #f8f8f9;">用户自编号</td>
-                    <td>A2</td>
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9;">业务受理号</td>
-                    <td colspan="3">A201812100733</td>
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9">使用编号</td>
-                    <td colspan="3">0148808383</td>
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9;">报告编号</td>
-                    <td colspan="3">0101-2019-00919</td>
+        <!--<div class="row" style="margin-top: 2%;padding: 1%;box-sizing: border-box">-->
+            <!--<table class="table table-bordered" style="overflow: scroll">-->
+                <!--<tbody>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;;">序号</td>-->
+                    <!--<td>1</td>-->
+                    <!--<td style="background: #f8f8f9;">检验进度</td>-->
+                    <!--<td>未出报告</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;">业务类别</td>-->
+                    <!--<td>法定</td>-->
+                    <!--<td style="background: #f8f8f9;">用户自编号</td>-->
+                    <!--<td>A2</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;">业务受理号</td>-->
+                    <!--<td colspan="3">A201812100733</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9">使用编号</td>-->
+                    <!--<td colspan="3">0148808383</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;">报告编号</td>-->
+                    <!--<td colspan="3">0101-2019-00919</td>-->
 
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9;">注册代码</td>
-                    <td colspan="3">3110-440111-201108-0058</td>
-                </tr>
-                <tr>
-                    <td style="background: #f8f8f9;">出厂编号</td>
-                    <td colspan="3">E/30007759.001</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="row" style="text-align: right;padding-right: 1%">
-            <ul class="pagination">
-                <li><a href="###">&laquo;</a></li>
-                <li class="active"><a href="###">1</a></li>
-                <li><a href="###">2</a></li>
-                <li><a href="###">3</a></li>
-                <li><a href="###">4</a></li>
-                <li><a href="###">5</a></li>
-                <li><a href="###">&raquo;</a></li>
-            </ul>
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;">注册代码</td>-->
+                    <!--<td colspan="3">3110-440111-201108-0058</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td style="background: #f8f8f9;">出厂编号</td>-->
+                    <!--<td colspan="3">E/30007759.001</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+
+        <div style="margin-top: 3%;overflow: hidden">
+            <table id="tb_departments"></table>
+            <div class="row" style="text-align: right;padding-right: 1%">
+                <ul class="pagination">
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                    <li class="active"><a href="#">1<span class="sr-only">(current)</span></a></li>
+                </ul>
+            </div>
         </div>
 </div>
-
-
 <script src="node_modules/jquery/dist/jquery.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+<script src="js/bootstrap-table-develop/dist/bootstrap-table.js"></script>
+<script src="js/2.js"></script>
+<script src="js/bootstrap-table-zh-CN.js"></script>
+<script src="js/moment.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#dateBtn').click(function () {
+            if($(".iDate.full").length>0){
+                $(".iDate.full").datetimepicker({
+                    locale: "zh-cn",
+                    format: "YYYY-MM-DD",
+                    dayViewHeaderFormat: "YYYY年 MMMM"
+                });
+            }
+        })
+    })
+</script>
 <script>
     $('#showBtn').click(function () {
         $('#hidebox').toggle();
     })
+    $(function () {
+        //1.初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+    });
+
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        var responseHandler = function (e) {
+
+            var datas={total: e.page.total, data: e.page.rows, pageSize: e.page.pageSize, pageNo: e.page.pageNo}
+
+            return datas;
+
+
+        }
+        //初始化Table
+        oTableInit.Init = function () {
+            // var tableData
+            //     $.ajax({
+            //         url:'http://localhost:9091/api/business/list_exam_progress?access_token=a06b8778-dfcf-4c8c-83b2-294c84b6eba6&role=ROLE_USE_UNIT',    //请求的url地址
+            //         dataType:"json",   //返回格式为json
+            //         async:true,//请求是否异步，默认为异步，这也是ajax重要特性
+            //         type:"GET",   //请求方式
+            //         success:function(req){
+            //             //请求成功时处理
+            //             tableData = req.page
+            //         }
+            //     });
+
+            $('#tb_departments').bootstrapTable({
+                // url:'tableData.json',
+                // url:tableData,
+                url: 'https://www.gzisd.org:8443/isdplatformapi/api/business/list_exam_progress?access_token=dfdd8e63-ed71-4847-a4ad-c0e3bb2944cd&role=ROLE_USE_UNIT&order=asc',         //请求后台的URL（*）
+                type:'get',
+                //分页的
+                pagination: true,
+                paginationPreText:'previous',
+                paginationNextText:'Next',
+                paginationFirstTest:'First',
+                paginationLastText:'Last',
+
+                paginationShowPageGo: true,
+                formatClearFilters: function () {
+                    return '清空过滤';
+                },
+                pageGo: function () {
+                    return '跳转到';
+                },
+                pageNumber: 1,                   //初始化加载第一页，默认第一页
+                pageSize: 20,                    //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],     //可供选择的每页的行数（*）
+                responseHandler: responseHandler, //关键代码，返回json格式
+                columns: [
+                    {
+                        field: 'id',
+                        title: '序号',
+                        formatter: function (value, row, index) {
+                            //获取每页显示的数量
+                            var pageSize = $('#tb_departments').bootstrapTable('getOptions').pageSize;
+                            //获取当前是第几页
+                            var pageNumber = $('#tb_departments').bootstrapTable('getOptions').pageNumber;
+                            //返回序号，注意index是从0开始的，所以要加上1
+                            return pageSize * (pageNumber - 1) + index + 1;
+                        }
+                    },
+               {
+                    field: 'status',
+                    title: '检验进度'
+                },{
+                        field: 'businessKind',
+                        title: '业务类别',
+                        formatter: function(value, row, index) {
+                            if(value=='1'){
+                                return '法定'
+                            }else{
+                                return  '其他'
+                            }
+
+                        }
+                    }, {
+                    field: 'acceptNo',
+                    title: '业务受理号'
+                }, {
+                        field: 'certificateNo',
+                        title: '使用编号'
+                    }
+                    , {
+                        field: 'reportNo',
+                        title: '报告编号'
+                    }
+                    , {
+                        field: 'regNo',
+                        title: '注册代码'
+                    }
+                    , {
+                        field: 'mfgNo',
+                        title: '出厂编号'
+                    }
+                    , {
+                        field: 'userNo',
+                        title: '用户自编号'
+                    }
+                ]
+            });
+        };
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                offset: params.offset,  //页码
+                departmentname: $("#txt_search_departmentname").val(),
+                statu: $("#txt_search_statu").val()
+            };
+            return temp;
+        };
+        return oTableInit;
+    };
 </script>
 </body>
 </html>
